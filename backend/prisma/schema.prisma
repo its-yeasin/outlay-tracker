@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OriginType {
+  WALLET
+  PERSON
+  USER
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  wallets    Wallet[]
+  loansGiven Loan[]   @relation("LoanFromUser")
+  loansTaken Loan[]   @relation("LoanToUser")
+}
+
+model Wallet {
+  id              Int    @id @default(autoincrement())
+  name            String
+  type            String // e.g., bank, random
+  totalBalance    Float  @default(0)
+  mainBalance     Float  @default(0)
+  interestBalance Float  @default(0)
+  userId          Int?
+  user            User?  @relation(fields: [userId], references: [id])
+
+  loansGivenFrom Loan[] @relation("LoanFromWallet")
+  loansGivenTo   Loan[] @relation("LoanToWallet")
+
+  expenses Expense[]
+}
+
+model Person {
+  id    Int     @id @default(autoincrement())
+  name  String
+  email String  @unique
+  phone String?
+
+  loansGiven Loan[] @relation("LoanFromPerson")
+  loansTaken Loan[] @relation("LoanToPerson")
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  balanceType String // could be mainBalance, interestBalance, etc.
+  category    String
+  note        String?
+  walletId    Int
+  wallet      Wallet   @relation(fields: [walletId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Loan {
+  id       Int        @id @default(autoincrement())
+  amount   Float
+  fromType OriginType
+  toType   OriginType
+
+  // From relations
+  fromWallet   Wallet? @relation("LoanFromWallet", fields: [fromWalletId], references: [id])
+  fromPerson   Person? @relation("LoanFromPerson", fields: [fromPersonId], references: [id])
+  fromUser     User?   @relation("LoanFromUser", fields: [fromUserId], references: [id])
+  fromWalletId Int?
+  fromPersonId Int?
+  fromUserId   Int?
+
+  // To relations
+  toWallet   Wallet? @relation("LoanToWallet", fields: [toWalletId], references: [id])
+  toPerson   Person? @relation("LoanToPerson", fields: [toPersonId], references: [id])
+  toUser     User?   @relation("LoanToUser", fields: [toUserId], references: [id])
+  toWalletId Int?
+  toPersonId Int?
+  toUserId   Int?
+
+  createdAt DateTime @default(now())
+}
