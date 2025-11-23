@@ -20,14 +20,17 @@
   "homepage": "https://github.com/its-yeasin/outlay-tracker#readme",
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/connect-livereload": "^0.6.3",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
-    "prisma": "^6.19.0",
+    "@types/livereload": "^0.9.5",
+    "@types/node": "^24.10.1",
+    "connect-livereload": "^0.6.1",
+    "livereload": "^0.10.3",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
